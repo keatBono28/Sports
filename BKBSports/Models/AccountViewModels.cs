@@ -79,6 +79,9 @@ namespace BKBSports.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+        
+        // Bring the UserProfile into the RegisterModel
+        public virtual UserProfile UserProfile { get; set; }
     }
 
     public class ResetPasswordViewModel

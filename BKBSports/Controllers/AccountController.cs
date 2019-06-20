@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BKBSports.Models;
+using System.IO;
 
 namespace BKBSports.Controllers
 {
@@ -147,11 +148,48 @@ namespace BKBSports.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register([Bind(Exclude = "profileImage")]RegisterViewModel model, UserProfile userProfile)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                // Convert the user profile image upload to a byte array
+                byte[] imageData = null;
+                if (Request.Files.Count > 0)
+                {
+                    HttpPostedFileBase poImageFile = Request.Files["profileImage"];
+                    using (var binary = new BinaryReader(poImageFile.InputStream))
+                    {
+                        imageData = binary.ReadBytes(poImageFile.ContentLength);
+                    }
+                }
+                // Check optional user profile data in the POST action
+                if (userProfile.preferredName != null)
+                {
+                    // Assign the preffered name attribute the first name info
+                    userProfile.preferredName = userProfile.firstName;
+                }
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    UserProfile = new UserProfile
+                    {
+                        // Set the POST data to the new profile
+                        firstName = userProfile.firstName,
+                        lastName = userProfile.lastName,
+                        dateOfBirth = userProfile.dateOfBirth,
+                        phoneNumber = userProfile.phoneNumber,
+                        preferredName = userProfile.preferredName,
+                        // Assign the timestamps
+                        profileCreationDate = DateTime.Now,
+                        profileUpdateTimestamp = DateTime.Now,
+                        // Assign all profiles a public profile type unless admin changes
+                        profileType = ProfileType.Public,
+                        // Finally, assign the profile image data
+                        profileImage = userProfile.profileImage = imageData
+                    }
+                };
+                // Wait for result
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -167,7 +205,6 @@ namespace BKBSports.Controllers
                 }
                 AddErrors(result);
             }
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
