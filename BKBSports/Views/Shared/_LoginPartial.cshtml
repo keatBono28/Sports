@@ -1,16 +1,38 @@
 ﻿@using Microsoft.AspNet.Identity
+@using BKBSports.Models
+@using Microsoft.AspNet.Identity.EntityFramework;
 @if (Request.IsAuthenticated)
 {
+    var manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+    var currentUser = manager.FindById(User.Identity.GetUserId());
+    string displayName = currentUser.UserProfile.firstName;
+    if (currentUser.UserProfile.preferredName != null)
+    {
+        displayName = currentUser.UserProfile.preferredName;
+    }
+
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
-    @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
-        </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-    </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="btn-group">
+                <button type="button" class="btn navbar-btn">
+                    @Html.ActionLink("Hello " + displayName + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+                </button>
+                <button type="button" class="btn navbar-btn dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>@Html.ActionLink("Edit Profile", "Edit", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                    <li>@Html.ActionLink("View Profile", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                </ul>
+            </li>
+            <li>
+            <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+            </li>
+        </ul>
     }
 }
 else
