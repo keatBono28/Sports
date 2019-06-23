@@ -55,7 +55,7 @@ namespace BKBSports.Controllers
             if (ModelState.IsValid)
             {
                 db.UserProfiles.Add(userProfile);
-                db.SaveChanges();
+                db.SaveChanges(); 
                 return RedirectToAction("Index");
             }
 
@@ -171,6 +171,7 @@ namespace BKBSports.Controllers
             base.Dispose(disposing);
         }
 
+        // -- Method to Authorize the logged in User to prevent hacks and updates that arent meant for original user
         private int AuthorizeLoggedInUser()
         {
             int userId = 0;
