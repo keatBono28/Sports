@@ -97,16 +97,16 @@ namespace BKBSports.Controllers
         // GET: Article/Delete/5
         public ActionResult Delete(int? id)
         {
-            //if (id == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //}
-            //ArticleModel articleModel = db.Articles.Find(id);
-            //if (articleModel == null)
-            //{
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            ArticleModel articleModel = db.Articles.Find(id);
+            if (articleModel == null)
+            {
                 return HttpNotFound();
-            //}
-            //return View(articleModel);
+            }
+            return View(articleModel);
         }
 
         // POST: Article/Delete/5

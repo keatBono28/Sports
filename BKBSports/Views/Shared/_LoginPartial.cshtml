@@ -10,6 +10,7 @@
     {
         displayName = currentUser.UserProfile.preferredName;
     }
+    string userType = Convert.ToString(currentUser.UserProfile.profileType);
 
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
@@ -27,6 +28,16 @@
                 <ul class="dropdown-menu" role="menu">
                     <li>@Html.ActionLink("Edit Profile", "Edit", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
                     <li>@Html.ActionLink("View Profile", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                    @if (userType == "Admin")
+                    {
+                        <li>@Html.ActionLink("View Dashboard", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                        <li>@Html.ActionLink("Add Author", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                        <li>@Html.ActionLink("Approve Articles", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                    }
+                    @if (userType == "Author")
+                    {
+                        <li>@Html.ActionLink("Write an Article", "Details", "UserProfiles", new { @id = currentUser.UserProfile.userId }, null)</li>
+                    }
                 </ul>
             </li>
             <li>
